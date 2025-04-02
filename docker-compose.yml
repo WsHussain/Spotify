@@ -10,6 +10,8 @@ services:
       depends_on:
         - db
     db:
+      ports:
+        - "3306:3306"
       image: mysql
       volumes:
         - ./my_spotify_db.sql:/docker-entrypoint-initdb.d/dump.sql

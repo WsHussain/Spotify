@@ -1,19 +1,35 @@
-const express= require('express');
-const cors= require('cors');
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
 const app = express();
-app.use(cors());
+const mysql = require('mysql2');
+const port = 5000;
 
+const connection = mysql.createConnection({
+    host: 'localhost',
+    password: 'spotypwd',
+    user: 'spoty',
+    database: 'spotify',
+});
 
-app.get('/api', (req, res) => {
-    return res.json({message: "Hello from the server!"});
-}
-);
-
-app.listen(8081 , () => {
-    console.log("Server is running on port 8081");
+connection.connect((err) => {
+    if (err) {
+        console.error('Database connection failed:', err.stack);
+        return;
+    }
+    console.log('Connected to the database.');
 });
 
 
-// const bodyParser= require('body-parser');
-// const app= express();
-// const port= 3000;
+
+app.use(cors());
+app.use(bodyParser.json());
+
+  app.get('/api', (req, res) => {
+    return res.send('hello World!');
+  })
+
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
+
