@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 import TestPage from './components/TestPage';
 import AlbumPage from './components/AlbumPage';
+// import ArtistPage from './components/ArtistePage';
 import './App.css';
 
 function App() {
@@ -20,11 +21,13 @@ function App() {
       <nav>
         <Link to="/">Home</Link> | 
         <Link to="/test">Test Page</Link>
+        {/* <Link to ="/artist">Liste des artistes</Link> */}
       </nav>
       
       <Routes>
         <Route path="/test" element={<TestPage />} />
         <Route path="/album/:id" element={<AlbumPage />} />
+        {/* <Route path="/artist" element={<ArtistPage />} /> */}
         <Route path="/" element={
           <div>
             <h1>Albums</h1>
