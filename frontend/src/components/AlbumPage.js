@@ -1,13 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
+import AudioPlayer from './AudioPlayer';
 import './AlbumPage.css';
 
 function AlbumPage() {
   const { id } = useParams();
   const [albumData, setAlbumData] = useState(null);
   const [error, setError] = useState(null);
-  const [playingTrack, setPlayingTrack] = useState(null);
-  const audioRefs = useRef({});
+  const [currentTrack, setCurrentTrack] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     fetch(`http://localhost:8000/albums/${id}`)
@@ -19,72 +20,161 @@ function AlbumPage() {
       .catch(error => setError(error.message));
   }, [id]);
 
-  const handlePlayPause = (trackId) => {
-    const audio = audioRefs.current[trackId];
-    
-    if (playingTrack === trackId) {
-      if (audio.paused) {
-        audio.play();
-      } else {
-        audio.pause();
-      }
+  const handlePlayPause = (track) => {
+    if (currentTrack && currentTrack.id === track.id) {
+      setIsPlaying(!isPlaying);
     } else {
-      if (playingTrack) {
-        audioRefs.current[playingTrack].pause();
-      }
-      audio.play();
-      setPlayingTrack(trackId);
+      setCurrentTrack({
+        ...track,
+        albumCover: albumData.album.cover,
+        album: albumData.album.name,
+        artist: albumData.album.artist // Ajout de l'artiste
+      });
+      setIsPlaying(true);
     }
   };
 
-  if (error) return <div>Error: {error}</div>;
-  if (!albumData) return <div>Loading...</div>;
+  const handlePlayAlbum = () => {
+    if (tracks && tracks.length > 0) {
+      const firstTrack = tracks[0];
+      setCurrentTrack({
+        ...firstTrack,
+        albumCover: album.cover,
+        album: album.name,
+        artist: album.artist // Ajout de l'artiste
+      });
+      setIsPlaying(true);
+    }
+  };
+
+  const getCurrentTrackIndex = () => {
+    return tracks.findIndex(track => track.id === currentTrack?.id);
+  };
+
+  const handleNext = () => {
+    const currentIndex = getCurrentTrackIndex();
+    if (currentIndex < tracks.length - 1) {
+      const nextTrack = tracks[currentIndex + 1];
+      setCurrentTrack({
+        ...nextTrack,
+        albumCover: album.cover,
+        album: album.name
+      });
+      setIsPlaying(true);
+    }
+  };
+
+  const handlePrevious = () => {
+    const currentIndex = getCurrentTrackIndex();
+    if (currentIndex > 0) {
+      const previousTrack = tracks[currentIndex - 1];
+      setCurrentTrack({
+        ...previousTrack,
+        albumCover: album.cover,
+        album: album.name
+      });
+      setIsPlaying(true);
+    }
+  };
+
+  const handleTrackClick = (track) => {
+    if (currentTrack?.id === track.id) {
+      setIsPlaying(!isPlaying);
+    } else {
+      setCurrentTrack({
+        ...track,
+        albumCover: album.cover,
+        album: album.name
+      });
+      setIsPlaying(true);
+    }
+  };
+
+  const renderPlayButton = (track) => {
+    const isCurrentTrack = currentTrack?.id === track.id;
+    const isThisPlaying = isCurrentTrack && isPlaying;
+
+    return (
+      <button 
+        className={`track-play-button ${isCurrentTrack ? 'active' : ''}`}
+        onClick={() => handlePlayPause(track)}
+      >
+        <i className={`fas ${isThisPlaying ? 'fa-pause' : 'fa-play'}`}></i>
+        <span className="track-number">
+          {isCurrentTrack ? <i className="fas fa-volume-up"></i> : track.track_no}
+        </span>
+      </button>
+    );
+  };
+
+  if (error) return <div className="error-message">Error: {error}</div>;
+  if (!albumData) return <div className="loading-message">Loading...</div>;
 
   const { album, tracks } = albumData;
 
   return (
     <div className="album-page">
       <div className="album-header">
-        <img 
-          src={album.cover}
-          alt={`Cover de ${album.name}`}
-          className="album-cover-img"
-          onError={(e) => {
-           console.log('Image not found, setting placeholder');
-          }}
-        />
+        <div className="album-cover-container">
+          <img 
+            src={album.cover}
+            alt={`Cover de ${album.name}`}
+            className="album-cover-img"
+            onError={(e) => {
+              console.log('Image not found, setting placeholder');
+            }}
+          />
+          <button 
+            className="header-play-button"
+            onClick={handlePlayAlbum}
+          >
+            <i className={`fas ${isPlaying ? 'fa-pause' : 'fa-play'}`}></i>
+          </button>
+        </div>
         <div className="album-info">
+          <span className="album-type">Album</span>
           <h1>{album.name}</h1>
           <p className="album-description">{album.description}</p>
         </div>
       </div>
       
       <ul className="tracks-list">
-        {tracks.map(track => (
-          <li key={track.id} className="track-item">
-            <button 
-              className="play-button"
-              onClick={() => handlePlayPause(track.id)}
-            >
-              {playingTrack === track.id ? '⏸️' : '▶️'}
-            </button>
-            <span className="track-number">{track.track_no}</span>
-            <span className="track-name">{track.name}</span>
+        {tracks.map((track, index) => (
+          <li 
+            key={track.id} 
+            className={`track-item ${currentTrack?.id === track.id ? 'playing' : ''}`}
+            onClick={() => handleTrackClick(track)}
+          >
+            <span className="track-number">
+              {currentTrack?.id === track.id ? 
+                <i className="fas fa-volume-up"></i> : 
+                (index + 1).toString().padStart(2, '0')}
+            </span>
+            <div className="track-info">
+              <span className="track-name">{track.name}</span>
+            </div>
             <span className="track-duration">
               {Math.floor(track.duration / 60)}:{String(track.duration % 60).padStart(2, '0')}
             </span>
-            <audio 
-              ref={el => audioRefs.current[track.id] = el}
-              controls
-              className="track-player"
-              src={track.mp3}
-              onEnded={() => setPlayingTrack(null)}
-            >
-              Your browser does not support the audio element.
-            </audio>
           </li>
         ))}
       </ul>
+
+      {currentTrack && (
+        <AudioPlayer 
+          currentTrack={currentTrack}
+          isPlaying={isPlaying}
+          setIsPlaying={setIsPlaying}
+          onNext={handleNext}
+          onPrevious={handlePrevious}
+          hasNext={getCurrentTrackIndex() < tracks.length - 1}
+          hasPrevious={getCurrentTrackIndex() > 0}
+          onClose={() => {
+            setCurrentTrack(null);
+            setIsPlaying(false);
+          }}
+        />
+      )}
     </div>
   );
 }
