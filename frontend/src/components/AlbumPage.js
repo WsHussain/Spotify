@@ -50,7 +50,7 @@ function AlbumPage() {
           alt={`Cover de ${album.name}`}
           className="album-cover-img"
           onError={(e) => {
-            e.target.src = 'https://via.placeholder.com/300';
+           console.log('Image not found, setting placeholder');
           }}
         />
         <div className="album-info">
