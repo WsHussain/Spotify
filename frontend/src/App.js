@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
-import TestPage from './components/TestPage';
 import AlbumPage from './components/AlbumPage';
-
-import './App.css';
 import ArtistDetailPage from './components/ArtistDetailPage';
+import ArtistPage from './components/ArtistPage';
+import GenreList from './components/GenreList';
+import GenreDetail from './components/GenreDetail';
+import './App.css';
 
 function App() {
   const [albums, setAlbums] = useState([]);
@@ -19,17 +20,21 @@ function App() {
 
   return (
     <div className="App">
-      <nav>
-        <Link to="/">Home</Link> | 
-
+      <nav className="nav-menu">
+        <Link to="/" className="nav-link">Home</Link> |
+        <Link to="/artists" className="nav-link">Artists</Link> |
+        <Link to="/genres" className="nav-link">Genres</Link> |
+        <Link to="/albums" className="nav-link">Albums</Link>
       </nav>
       
       <Routes>
-        <Route path="/test" element={<TestPage />} />
+        <Route path="/artists" element={<ArtistPage />} />
+        <Route path="/artists/:id" element={<ArtistDetailPage />} />
+        <Route path="/genres" element={<GenreList />} />
+        <Route path="/genres/:id" element={<GenreDetail />} />
         <Route path="/album/:id" element={<AlbumPage />} />
-
-        <Route path="/" element={
-          <div>
+        <Route path="/albums" element={
+          <div className="page-container">
             <h1>Albums</h1>
             <div className="albums-container">
               {albums.map(album => (
@@ -37,7 +42,6 @@ function App() {
                   key={album.id} 
                   className="album-card" 
                   onClick={() => navigate(`/album/${album.id}`)}
-                  style={{ cursor: 'pointer' }}
                 >
                   <img
                     src={album.cover}
@@ -50,6 +54,22 @@ function App() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        } />
+        <Route path="/" element={
+          <div className="page-container">
+            <h1>Welcome to Spotify Clone</h1>
+            <div className="welcome-links">
+              <button onClick={() => navigate('/artists')} className="nav-button">
+                Discover Artists
+              </button>
+              <button onClick={() => navigate('/genres')} className="nav-button">
+                Browse Genres
+              </button>
+              <button onClick={() => navigate('/albums')} className="nav-button">
+                View Albums
+              </button>
             </div>
           </div>
         } />
