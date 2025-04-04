@@ -45,9 +45,7 @@ function App() {
                     src={album.cover}
                     alt={`Cover de ${album.name}`}
                     className="album-cover"
-                    onError={(e) => {
-                      console.log('Image not found, setting placeholder');
-                    }}
+                    }
                   />
                   <div className="album-info">
                     <p className="album-name">{album.name}</p>
