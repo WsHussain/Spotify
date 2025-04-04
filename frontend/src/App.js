@@ -43,7 +43,6 @@ function App() {
                     src={album.cover}
                     alt={`Cover de ${album.name}`}
                     className="album-cover"
-                    }
                   />
                   <div className="album-info">
                     <p className="album-name">{album.name}</p>
