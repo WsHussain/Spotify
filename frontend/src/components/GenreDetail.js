@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import './GenreDetail.css';
+
 
 function GenreDetail() {
   const { id } = useParams();
@@ -69,33 +71,35 @@ function GenreDetail() {
   if (!genre) return <div>Genre not found</div>;
 
   return (
-    <div>
-      <h1>{genre.name}</h1>
-      <h2>Albums ({albums.length})</h2>
-      {albums.length === 0 ? (
-        <p>No albums found for this genre</p>
-      ) : (
-        <div className="albums-grid">
-          {albums.map(album => (
-            <div key={album.id} className="album-card">
-              <Link to={`/album/${album.id}`}>
-                {album.cover_small && (
-                  <img
-                    src={album.cover_small}
-                    alt={album.name || 'Album cover'}
-                  />
-                )}
-                <h3>{album.name || 'Untitled Album'}</h3>
-                {album.popularity && (
-                  <div className="album-popularity">
-                    Popularity: {album.popularity}/10
-                  </div>
-                )}
-              </Link>
-            </div>
-          ))}
+    <div className="genre-container">
+        <div className="genre-header">
+            <h1 className="genre-title">{genre.name}</h1>
+            <h2 className="genre-subtitle">Albums ({albums.length})</h2>
         </div>
-      )}
+        {albums.length === 0 ? (
+            <p className="no-albums">No albums found for this genre</p>
+        ) : (
+            <div className="albums-grid">
+                {albums.map(album => (
+                    <div key={album.id} className="album-card">
+                        <Link to={`/album/${album.id}`}>
+                            {album.cover_small && (
+                                <img
+                                    src={album.cover_small}
+                                    alt={album.name || 'Album cover'}
+                                />
+                            )}
+                            <h3>{album.name || 'Untitled Album'}</h3>
+                            {album.popularity && (
+                                <div className="album-popularity">
+                                    Popularity: {album.popularity}/10
+                                </div>
+                            )}
+                        </Link>
+                    </div>
+                ))}
+            </div>
+        )}
     </div>
   );
 }
